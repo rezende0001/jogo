@@ -8,11 +8,18 @@
     body {
         font-family: Arial, sans-serif;
         text-align: center;
+        background-color: #f0dab1;
+        margin: 0;
+        padding: 0;
+    }
+    h1 {
+        margin-top: 20px;
+        margin-bottom: 10px;
     }
     #board {
         display: grid;
-        grid-template-columns: repeat(8, 80px);
-        grid-template-rows: repeat(8, 80px);
+        grid-template-columns: repeat(8, 70px);
+        grid-template-rows: repeat(8, 70px);
         gap: 2px;
         margin: 20px auto;
         border: 2px solid black;
@@ -22,7 +29,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 36px;
+        font-size: 28px;
         background-color: #f0dab1;
         cursor: pointer;
     }
@@ -32,13 +39,18 @@
     .selected {
         background-color: #f5d76e;
     }
+    #player-turn {
+        margin-bottom: 20px;
+    }
 </style>
 </head>
 <body>
 <h1>Jogo de Damas</h1>
+<div id="player-turn"></div>
 <div id="board"></div>
 <script>
     const board = document.getElementById('board');
+    const playerTurn = document.getElementById('player-turn');
     let cells = [];
     let currentPlayer = 'white';
     let selectedPiece = null;
@@ -81,6 +93,7 @@
                     currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
                     selectedPiece.classList.remove('selected');
                     selectedPiece = null;
+                    playerTurn.textContent = `É a vez do jogador ${currentPlayer === 'white' ? 'branco' : 'preto'}`;
                 }
             }
         } else {
@@ -97,6 +110,7 @@
     }
 
     createBoard();
+    playerTurn.textContent = `É a vez do jogador ${currentPlayer === 'white' ? 'branco' : 'preto'}`;
 </script>
 </body>
 </html>
