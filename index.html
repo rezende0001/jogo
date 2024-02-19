@@ -76,7 +76,7 @@
             cells[index] = currentPlayer;
             renderBoard();
             if (checkWinner()) {
-                status.textContent = `O jogador ${currentPlayer} venceu!`;
+                status.textContent = `O jogador ${currentPlayer === 'X' ? player1Name : player2Name} venceu!`;
                 updateScore();
             } else if (isBoardFull()) {
                 status.textContent = 'Empate!';
