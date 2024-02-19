@@ -8,11 +8,15 @@
     body {
         font-family: Arial, sans-serif;
         text-align: center;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         height: 100vh;
-        margin: 0;
     }
     #board {
         display: grid;
@@ -30,7 +34,13 @@
         cursor: pointer;
     }
     #players {
+        display: flex;
+        justify-content: space-between;
+        width: 300px;
         margin-bottom: 20px;
+    }
+    #score {
+        text-align: center;
     }
     #restartBtn {
         padding: 10px 20px;
@@ -40,18 +50,27 @@
 </style>
 </head>
 <body>
-<h1>Jogo da Velha</h1>
-<div id="players">
-    <input type="text" id="player1Name" placeholder="Nome do Jogador 1">
-    <input type="text" id="player2Name" placeholder="Nome do Jogador 2">
-    <div id="score">
-        <p><span id="player1Score">0</span> - <span id="player2Score">0</span></p>
+<div class="container">
+    <h1>Jogo da Velha</h1>
+    <div id="players">
+        <div id="player1">
+            <label for="player1Name">Nome do Jogador 1:</label>
+            <input type="text" id="player1Name" placeholder="Jogador 1">
+        </div>
+        <div id="player2">
+            <label for="player2Name">Nome do Jogador 2:</label>
+            <input type="text" id="player2Name" placeholder="Jogador 2">
+        </div>
+        <div id="score">
+            <p><span id="player1Score">0</span> - <span id="player2Score">0</span></p>
+        </div>
     </div>
+    <div id="board"></div>
+    <p id="status"></p>
+    <button id="restartBtn">Recomeçar</button>
 </div>
-<div id="board"></div>
-<p id="status"></p>
-<button id="restartBtn">Recomeçar</button>
 <script>
+    const container = document.querySelector('.container');
     const board = document.getElementById('board');
     const status = document.getElementById('status');
     const restartBtn = document.getElementById('restartBtn');
@@ -76,10 +95,11 @@
             cells[index] = currentPlayer;
             renderBoard();
             if (checkWinner()) {
-                status.textContent = `O jogador ${currentPlayer === 'X' ? player1Name : player2Name} venceu!`;
+                status.textContent = `O jogador ${currentPlayer} venceu!`;
                 updateScore();
             } else if (isBoardFull()) {
                 status.textContent = 'Empate!';
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
             } else {
                 currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
                 status.textContent = `É a vez de ${currentPlayer === 'X' ? player1Name : player2Name}`;
@@ -87,66 +107,4 @@
         }
     }
 
-    function renderBoard() {
-        board.innerHTML = '';
-        cells.forEach((value, index) => {
-            const cell = document.createElement('div');
-            cell.className = 'cell';
-            cell.textContent = value;
-            cell.addEventListener('click', () => handleClick(index));
-            board.appendChild(cell);
-        });
-    }
-
-    function checkWinner() {
-        const winningCombos = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3, 6],
-            [1, 4, 7],
-            [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
-        ];
-
-        return winningCombos.some(combo => {
-            const [a, b, c] = combo;
-            return cells[a] && cells[a] === cells[b] && cells[a] === cells[c];
-        });
-    }
-
-    function isBoardFull() {
-        return cells.every(cell => cell !== '');
-    }
-
-    function isGameOver() {
-        return checkWinner() || isBoardFull();
-    }
-
-    function restartGame() {
-        cells = Array.from({ length: 9 }, () => '');
-        currentPlayer = 'X';
-        renderBoard();
-        updatePlayerNames();
-        status.textContent = `É a vez de ${player1Name}`;
-    }
-
-    function updateScore() {
-        if (currentPlayer === 'X') {
-            player1Score++;
-            player1ScoreDisplay.textContent = player1Score;
-        } else {
-            player2Score++;
-            player2ScoreDisplay.textContent = player2Score;
-        }
-    }
-
-    restartBtn.addEventListener('click', restartGame);
-
-    renderBoard();
-    updatePlayerNames();
-    status.textContent = `É a vez de ${player1Name}`;
-</script>
-</body>
-</html>
+    function rend
