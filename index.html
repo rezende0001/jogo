@@ -3,170 +3,100 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jogo da Velha</title>
+<title>Jogo de Damas</title>
 <style>
     body {
         font-family: Arial, sans-serif;
         text-align: center;
-        margin: 0;
-        padding: 0;
-    }
-    .container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
     }
     #board {
         display: grid;
-        grid-template-columns: repeat(3, 100px);
-        grid-template-rows: repeat(3, 100px);
-        gap: 4px;
-        margin-bottom: 20px;
+        grid-template-columns: repeat(8, 60px);
+        grid-template-rows: repeat(8, 60px);
+        gap: 2px;
+        margin: 20px auto;
+        border: 2px solid black;
+        background-color: #d18b47;
     }
     .cell {
-        background-color: lightgray;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 36px;
+        font-size: 24px;
+        background-color: #f0dab1;
         cursor: pointer;
     }
-    #players {
-        display: flex;
-        justify-content: space-between;
-        width: 300px;
-        margin-bottom: 20px;
-    }
-    #score {
-        text-align: center;
-    }
-    #restartBtn {
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
+    .white {
+        color: white;
     }
 </style>
 </head>
 <body>
-<div class="container">
-    <h1>Jogo da Velha</h1>
-    <div id="players">
-        <div id="player1">
-            <label for="player1Name">Nome do Jogador 1:</label>
-            <input type="text" id="player1Name" placeholder="Jogador 1">
-        </div>
-        <div id="player2">
-            <label for="player2Name">Nome do Jogador 2:</label>
-            <input type="text" id="player2Name" placeholder="Jogador 2">
-        </div>
-        <div id="score">
-            <p><span id="player1Score">0</span> - <span id="player2Score">0</span></p>
-        </div>
-    </div>
-    <div id="board"></div>
-    <p id="status"></p>
-    <button id="restartBtn">Recomeçar</button>
-</div>
+<h1>Jogo de Damas</h1>
+<div id="board"></div>
 <script>
-    const container = document.querySelector('.container');
     const board = document.getElementById('board');
-    const status = document.getElementById('status');
-    const restartBtn = document.getElementById('restartBtn');
-    const player1NameInput = document.getElementById('player1Name');
-    const player2NameInput = document.getElementById('player2Name');
-    const player1ScoreDisplay = document.getElementById('player1Score');
-    const player2ScoreDisplay = document.getElementById('player2Score');
-    let player1Name = 'Jogador 1';
-    let player2Name = 'Jogador 2';
-    let currentPlayer = 'X';
-    let cells = Array.from({ length: 9 }, () => '');
-    let player1Score = 0;
-    let player2Score = 0;
+    let cells = [];
+    let currentPlayer = 'white';
 
-    function updatePlayerNames() {
-        player1Name = player1NameInput.value.trim() || 'Jogador 1';
-        player2Name = player2NameInput.value.trim() || 'Jogador 2';
-    }
-
-    function handleClick(index) {
-        if (cells[index] === '' && !isGameOver()) {
-            cells[index] = currentPlayer;
-            renderBoard();
-            if (checkWinner()) {
-                status.textContent = `O jogador ${currentPlayer} venceu!`;
-                updateScore();
-            } else if (isBoardFull()) {
-                status.textContent = 'Empate!';
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            } else {
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                status.textContent = `É a vez de ${currentPlayer === 'X' ? player1Name : player2Name}`;
+    function createBoard() {
+        for (let row = 0; row < 8; row++) {
+            cells[row] = [];
+            for (let col = 0; col < 8; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.row = row;
+                cell.dataset.col = col;
+                cell.addEventListener('click', () => handleClick(row, col));
+                cells[row][col] = cell;
+                if ((row + col) % 2 === 0) {
+                    cell.classList.add('white');
+                }
+                if (row < 3 && (row + col) % 2 !== 0) {
+                    cell.textContent = '●';
+                }
+                if (row > 4 && (row + col) % 2 !== 0) {
+                    cell.textContent = '○';
+                }
+                board.appendChild(cell);
             }
         }
     }
 
-    function renderBoard() {
-        board.innerHTML = '';
-        cells.forEach((value, index) => {
-            const cell = document.createElement('div');
-            cell.className = 'cell';
-            cell.textContent = value;
-            cell.addEventListener('click', () => handleClick(index));
-            board.appendChild(cell);
-        });
-    }
-
-    function checkWinner() {
-        const winningCombos = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3, 6],
-            [1, 4, 7],
-            [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
-        ];
-
-        return winningCombos.some(combo => {
-            const [a, b, c] = combo;
-            return cells[a] && cells[a] === cells[b] && cells[a] === cells[c];
-        });
-    }
-
-    function isBoardFull() {
-        return cells.every(cell => cell !== '');
-    }
-
-    function isGameOver() {
-        return checkWinner() || isBoardFull();
-    }
-
-    function updateScore() {
-        if (currentPlayer === 'X') {
-            player1Score++;
-            player1ScoreDisplay.textContent = player1Score;
+    function handleClick(row, col) {
+        const cell = cells[row][col];
+        if (cell.textContent !== '' || (row + col) % 2 === 0) return;
+        const selectedCell = document.querySelector('.selected');
+        if (selectedCell) {
+            const selectedRow = parseInt(selectedCell.dataset.row);
+            const selectedCol = parseInt(selectedCell.dataset.col);
+            const diffRow = Math.abs(row - selectedRow);
+            const diffCol = Math.abs(col - selectedCol);
+            if ((currentPlayer === 'white' && row > selectedRow) || (currentPlayer === 'black' && row < selectedRow)) {
+                if (diffRow === 1 && diffCol === 1) {
+                    movePiece(selectedRow, selectedCol, row, col);
+                    currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+                }
+            }
         } else {
-            player2Score++;
-            player2ScoreDisplay.textContent = player2Score;
+            if (cell.textContent === currentPlayer === 'white' ? '○' : '●') {
+                cell.classList.add('selected');
+            }
         }
     }
 
-    function restartGame() {
-        cells = Array.from({ length: 9 }, () => '');
-        currentPlayer = 'X';
-        renderBoard();
-        updatePlayerNames();
-        status.textContent = `É a vez de ${player1Name}`;
+    function movePiece(fromRow, fromCol, toRow, toCol) {
+        const fromCell = cells[fromRow][fromCol];
+        const toCell = cells[toRow][toCol];
+        toCell.textContent = fromCell.textContent;
+        fromCell.textContent = '';
+        const selectedCell = document.querySelector('.selected');
+        if (selectedCell) {
+            selectedCell.classList.remove('selected');
+        }
     }
 
-    restartBtn.addEventListener('click', restartGame);
-
-    renderBoard();
-    updatePlayerNames();
-    status.textContent = `É a vez de ${player1Name}`;
+    createBoard();
 </script>
 </body>
 </html>
