@@ -11,8 +11,8 @@
     }
     #board {
         display: grid;
-        grid-template-columns: repeat(8, 60px);
-        grid-template-rows: repeat(8, 60px);
+        grid-template-columns: repeat(8, 80px);
+        grid-template-rows: repeat(8, 80px);
         gap: 2px;
         margin: 20px auto;
         border: 2px solid black;
@@ -22,12 +22,15 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 24px;
+        font-size: 36px;
         background-color: #f0dab1;
         cursor: pointer;
     }
     .white {
         color: white;
+    }
+    .selected {
+        background-color: #f5d76e;
     }
 </style>
 </head>
@@ -38,6 +41,7 @@
     const board = document.getElementById('board');
     let cells = [];
     let currentPlayer = 'white';
+    let selectedPiece = null;
 
     function createBoard() {
         for (let row = 0; row < 8; row++) {
@@ -65,23 +69,23 @@
 
     function handleClick(row, col) {
         const cell = cells[row][col];
-        if (cell.textContent !== '' || (row + col) % 2 === 0) return;
-        const selectedCell = document.querySelector('.selected');
-        if (selectedCell) {
-            const selectedRow = parseInt(selectedCell.dataset.row);
-            const selectedCol = parseInt(selectedCell.dataset.col);
+        if (cell.textContent !== currentPlayer === 'white' ? '○' : '●') return;
+        if (selectedPiece) {
+            const selectedRow = parseInt(selectedPiece.dataset.row);
+            const selectedCol = parseInt(selectedPiece.dataset.col);
             const diffRow = Math.abs(row - selectedRow);
             const diffCol = Math.abs(col - selectedCol);
             if ((currentPlayer === 'white' && row > selectedRow) || (currentPlayer === 'black' && row < selectedRow)) {
                 if (diffRow === 1 && diffCol === 1) {
                     movePiece(selectedRow, selectedCol, row, col);
                     currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+                    selectedPiece.classList.remove('selected');
+                    selectedPiece = null;
                 }
             }
         } else {
-            if (cell.textContent === currentPlayer === 'white' ? '○' : '●') {
-                cell.classList.add('selected');
-            }
+            cell.classList.add('selected');
+            selectedPiece = cell;
         }
     }
 
@@ -90,10 +94,6 @@
         const toCell = cells[toRow][toCol];
         toCell.textContent = fromCell.textContent;
         fromCell.textContent = '';
-        const selectedCell = document.querySelector('.selected');
-        if (selectedCell) {
-            selectedCell.classList.remove('selected');
-        }
     }
 
     createBoard();
